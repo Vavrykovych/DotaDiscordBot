@@ -448,7 +448,7 @@ class Program
         client.Log += Log;
 
 
-        var token = "MTA4NDE1OTA1MTc4MjQzOTExNQ.GlFMJ6.QhwvNQHPd3wA0j4xsGWWbPXcrfUt-qN23OLXuU";
+        var token = "Set bot token here";
 
         await client.LoginAsync(TokenType.Bot, token);
         await client.StartAsync();
