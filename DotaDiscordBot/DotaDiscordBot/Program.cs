@@ -23,6 +23,7 @@ public class Player
 
     public List<Role> Roles { get; set; }
 
+    public SocketGuildUser DiscordUser { get; set; }
 }
 
 class Program
@@ -122,9 +123,9 @@ class Program
             },
     };
 
-    private async Task<List<Player>> ReadPlayersFromChannel(ISocketMessageChannel channel)
+    private async Task<List<Player>> ReadPlayersFromChannel(SocketTextChannel channel)
     {
-        var channelUsers = (await channel.GetUsersAsync().ToListAsync()).FirstOrDefault().ToList();
+        var channelUsers = channel.Users.ToList();
         var playersPool = new List<Player>();
 
         foreach (SocketGuildUser user in channelUsers)
@@ -137,21 +138,33 @@ class Program
                 {
                     playersPool.Add(player);
                 }
-
             }
         }
 
         return playersPool;
     }
 
-
-
-    private async Task MoveToVoiceChannels(List<Player> players)
+    private async Task MoveToVoiceChannels(List<Player> radient, List<Player> dire)
     {
+        ulong? radientTeamChannelId = 1084408132073160724;
+        ulong? direTeamChannelId = 1084408269717647400;
+
+        foreach (var player in radient)
+        {
+            if(player.DiscordUser != null)
+            {
+                await player.DiscordUser.ModifyAsync(x => x.ChannelId = radientTeamChannelId);
+            }
+        }
+
+        foreach (var player in dire)
+        {
+            if (player.DiscordUser != null)
+            {
+                await player.DiscordUser.ModifyAsync(x => x.ChannelId = direTeamChannelId);
+            }
+        }
     }
-
-
-
 
     private Player? MapDiscordUserToPlayerModel(SocketGuildUser user)
     {
@@ -165,7 +178,7 @@ class Program
             return null;
         }
 
-        var player = new Player { Name = user.DisplayName, Roles = new List<Role>() };
+        var player = new Player { Name = user.DisplayName, Roles = new List<Role>(), DiscordUser = user };
 
         if (roles.Contains("Mid"))
         {
@@ -195,9 +208,6 @@ class Program
         return player;
     }
 
-
-
-
     private async Task DivideTeamsAsync(SocketMessage msg)
     {
         try
@@ -211,9 +221,8 @@ class Program
 
             while (true)
             {
-                playersPool = GetHardcodedData;// Remove
-                //playersPool = await ReadPlayersFromChannel(msg.Channel);
-
+                //playersPool = GetHardcodedData;// Remove
+                playersPool = await ReadPlayersFromChannel(msg.Channel as SocketTextChannel);
 
                 if (playersPool.Count() < 10)
                 {
@@ -221,7 +230,7 @@ class Program
                 }
 
                 if (triesCounter > 1000000)
-                {
+                {   
                     throw new Exception("Некоректні ролі");
                 }
 
@@ -367,6 +376,10 @@ class Program
 
 
             await msg.Channel.SendMessageAsync(message);
+
+            await MoveToVoiceChannels(team1, team2);
+
+
             return;
         }
         catch (Exception ex)
@@ -401,33 +414,21 @@ class Program
                 await DivideTeamsAsync(msg);
                 break;
 
-            case ("/move"):
-                Console.WriteLine("Test");
-                //msg.F.
-
-                ulong? chId = 582143179445501953;
-
-                var channelUsers1 = (await msg.Channel.GetUsersAsync().ToListAsync()).FirstOrDefault().ToList().First() as SocketGuildUser;
-                await channelUsers1.ModifyAsync(x => x.ChannelId = chId);
-                //channelUsers1.V
-                //await channelUsers1.VoiceChannel.DisconnectAsync();
-
-                //await channelUsers1.VoiceChannel.;
-
-                break;
-
             case ("/pidar-scanner"):
                 await msg.Channel.SendMessageAsync("Шукаємо підара...");
-                var channelUsers = (await msg.Channel.GetUsersAsync().ToListAsync()).FirstOrDefault().ToList();
+                
+                var channel = msg.Channel as SocketTextChannel;
+                var channelUsers = channel.Users.ToList();
+
                 Random rand = new Random();
                 var padarIndex = rand.Next(0, channelUsers.Count);
                 SocketGuildUser pidarUser = channelUsers[padarIndex] as SocketGuildUser;
-                await msg.Channel.SendMessageAsync($"Підара знайдено... це - {pidarUser.DisplayName}");
+                await msg.Channel.SendMessageAsync($"Підара знайдено... це - { pidarUser.DisplayName}");
                 break;
 
             default:
                 await msg.Channel.SendMessageAsync("Ти хуйню пишеш");
-                break;  
+                break;
         }
     }
 
@@ -448,7 +449,7 @@ class Program
         client.Log += Log;
 
 
-        var token = "Set bot token here";
+        var token = "Place token here";
 
         await client.LoginAsync(TokenType.Bot, token);
         await client.StartAsync();
