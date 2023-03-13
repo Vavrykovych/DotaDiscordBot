@@ -25,7 +25,11 @@ namespace DotaBot.Modules
             IGuild guild = Context.Guild;
             IEnumerable<IGuildUser> users = await guild.GetUsersAsync();
             var filteredUsers = users.Where(x => !x.IsBot && x.Status != UserStatus.Offline).ToArray();
-            if (filteredUsers.Length == 0) return;
+            if (filteredUsers.Length == 0)
+            {
+                await ReplyAsync("Підара не знайдено(");
+                return;
+            }
 
             Random rand = new Random();
             var padarIndex = rand.Next(0, filteredUsers.Count());
