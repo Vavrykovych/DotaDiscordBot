@@ -11,60 +11,75 @@ namespace DotaBot.Modules
 {
     public class RolesCommands : ModuleBase<SocketCommandContext>
     {
+        private ulong?[] AllowedRoleIds = { 1084248441120628776, 1084248355049328793, 1084223352627003412, 1084248835481686067, 1084248949558358080 };
+
         [Command("add-role")]
-        [RequireUserPermission(GuildPermission.ManageRoles)]
-        public async Task AssignRoleCommand(SocketGuildUser user, SocketRole role)
+        public async Task AssignRoleCommand(SocketGuildUser user, params SocketRole[] roles)
         {
-            await AssignRole(user, role);
+            await AssignRole(user, roles);
         }
 
         [Command("remove-role")]
-        [RequireUserPermission(GuildPermission.ManageRoles)]
-        public async Task UnassignCommand(SocketGuildUser user, SocketRole role)
+        public async Task UnassignCommand(SocketGuildUser user, params SocketRole[] roles)
         {
-            await UnassignRole(user, role);
+            await UnassignRole(user, roles);
         }
 
-        public async Task AssignRole(SocketGuildUser user, SocketRole role)
+        public async Task AssignRole(SocketGuildUser user, params SocketRole[] roles)
         {
             try
             {
-                if (user.Roles.Contains(role))
+                foreach (SocketRole role in roles)
                 {
-                    await ReplyAsync($"{user.Mention} already has the {role.Name} role.");
-                    return;
-                }
+                    if (!AllowedRoleIds.Contains(role.Id))
+                    {
+                        await ReplyAsync($"Не можна присвоювати роль {role.Mention}.");
+                        continue;
+                    }
 
-                await user.AddRoleAsync(role);
-                await ReplyAsync($"{user.Mention} has been assigned the {role.Name} role.");
+                    if (user.Roles.Contains(role))
+                    {
+                        await ReplyAsync($"{user.Mention} вже має роль {role.Name}.");
+                        continue;
+                    }
+
+                    await user.AddRoleAsync(role);
+                    await ReplyAsync($"{user.Mention} було додано роль {role.Name}.");
+                }
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Failed to assign role to {user.Username}: {ex.Message}");
-                await ReplyAsync($"Failed to assign role to {user.Mention}. Please try again later.");
+                await ReplyAsync($"Не вийшло присвоїти роль {user.Mention}.");
             }
         }
 
-        public async Task UnassignRole(SocketGuildUser user, SocketRole role)
+        public async Task UnassignRole(SocketGuildUser user, params SocketRole[] roles)
         {
             try
             {
-                // Check if the user doesn't have the role.
-                if (!user.Roles.Contains(role))
+                foreach (SocketRole role in roles)
                 {
-                    await ReplyAsync($"{user.Mention} doesn't have the {role.Name} role.");
-                    return;
-                }
+                    if (!AllowedRoleIds.Contains(role.Id))
+                    {
+                        await ReplyAsync($"Не можна видалити роль {role.Mention}.");
+                        continue;
+                    }
 
-                // Remove the role from the user.
-                await user.RemoveRoleAsync(role);
-                await ReplyAsync($"{user.Mention} has been unassigned the {role.Name} role.");
+                    if (!user.Roles.Contains(role))
+                    {
+                        await ReplyAsync($"{user.Mention} не має ролі {role.Name}.");
+                        continue;
+                    }
+
+                    await user.RemoveRoleAsync(role);
+                    await ReplyAsync($"{user.Mention} було видалено роль {role.Name}.");
+                }
             }
             catch (Exception ex)
             {
-                // Handle any exceptions that might occur.
                 Console.WriteLine($"Failed to unassign role from {user.Username}: {ex.Message}");
-                await ReplyAsync($"Failed to unassign role from {user.Mention}. Please try again later.");
+                await ReplyAsync($"Не вийшло видалити роль {user.Mention}.");
             }
         }
     }

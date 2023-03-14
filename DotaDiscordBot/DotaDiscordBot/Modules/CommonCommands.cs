@@ -78,7 +78,7 @@ namespace DotaBot.Modules
                 var embed = new EmbedBuilder()
                     .WithTitle($"Help: {command.Name}")
                     .WithDescription(command.Summary)
-                    .AddField("Usage", $"!{command.Name} {string.Join(" ", command.Parameters.Select(p => $"[{p.Name}]"))}")
+                    .AddField("Usage", $"/{command.Name} {string.Join(" ", command.Parameters.Select(p => $"[{p.Name}]"))}")
                     .WithColor(Color.Blue)
                     .Build();
 
