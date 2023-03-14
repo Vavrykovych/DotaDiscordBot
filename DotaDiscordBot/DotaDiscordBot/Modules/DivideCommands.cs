@@ -287,7 +287,7 @@ namespace DotaBot.Modules
             {
                 if (player.DiscordUser != null)
                 {
-                    await player.DiscordUser.ModifyAsync(x => x.ChannelId = radientTeamChannelId);
+                    player.DiscordUser.ModifyAsync(x => x.ChannelId = radientTeamChannelId);
                 }
             }
 
@@ -295,7 +295,7 @@ namespace DotaBot.Modules
             {
                 if (player.DiscordUser != null)
                 {
-                    await player.DiscordUser.ModifyAsync(x => x.ChannelId = direTeamChannelId);
+                    player.DiscordUser.ModifyAsync(x => x.ChannelId = direTeamChannelId);
                 }
             }
         }

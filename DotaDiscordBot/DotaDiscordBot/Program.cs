@@ -52,7 +52,6 @@ class Program
             {
                 var guilds = _client.Guilds;
                 await _client.DownloadUsersAsync(guilds);
-                Console.WriteLine("Users data downloaded");
             };
 
             Console.ReadLine();
