@@ -1,6 +1,7 @@
 ﻿using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -101,5 +102,13 @@ namespace DotaBot.Modules
             }
         }
 
+        [Command("flip")]
+        public async Task CoinFlipAsync()
+        {
+            Random random = new Random();
+            int result = random.Next(3);
+            string outcome = result == 0 ? "Камінь" : (result == 1 ? "Ножиці" : "Папір");
+            await ReplyAsync($"{Context.User.Mention} {outcome}!");
+        }
     }
 }

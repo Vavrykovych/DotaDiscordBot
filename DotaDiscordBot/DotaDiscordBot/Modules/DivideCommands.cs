@@ -25,7 +25,6 @@ namespace DotaBot.Modules
 
                 while (true)
                 {
-                    //playersPool = GetHardcodedData;// Remove
                     playersPool = ReadActivePlayers();
 
                     if (playersPool.Count() < 10)
@@ -191,7 +190,7 @@ namespace DotaBot.Modules
         }
 
 
-        [Command("back-main-channel")]
+        [Command("back")]
         public async Task BackToMainChannel()
         {
             ulong? radientTeamChannelId = 1084408132073160724;
@@ -211,6 +210,8 @@ namespace DotaBot.Modules
                     user.ModifyAsync(x => x.ChannelId = mainChannelId);
                 }
             }
+
+            await ReplyAsync("Повернув людей в основний канал");
         }
 
         private List<Player> ReadActivePlayers()
