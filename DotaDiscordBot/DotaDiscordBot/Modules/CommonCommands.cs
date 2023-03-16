@@ -47,6 +47,21 @@ namespace DotaBot.Modules
             await ReplyAsync($"Підара знайдено, це - {pidarUser.DisplayName}");
         }
 
+        [Command("roll")]
+        public async Task Roll(int min = 0, int max = 100)
+        {
+            if (min > max)
+            {
+                (min, max) = (max, min);
+            }
+
+            var random = new Random();
+            var roll = random.Next(min, max + 1);
+
+            await ReplyAsync($"{Context.User.Mention} твоє число: {roll}");
+        }
+
+
         [Command("help")]
         [Summary("Displays a list of available commands or information about a specific command.")]
         public async Task HelpCommand([Remainder][Summary("The name of the command to get help for (optional).")] string commandName = null)
