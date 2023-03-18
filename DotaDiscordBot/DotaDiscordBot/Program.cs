@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Http.Headers;
-using System.Reflection;
-using System.Text;
+﻿using System.Reflection;
 
 using Discord;
 using Discord.Commands;
@@ -40,7 +34,8 @@ class Program
                 .AddSingleton(_commands)
                 .BuildServiceProvider();
 
-            var token = "Put token here";
+            // BOT_TOKEN
+            var token = Environment.GetEnvironmentVariable("BOT_TOKEN");
 
             _client.Log += Log;
             await RegisterCommandsAsync();
