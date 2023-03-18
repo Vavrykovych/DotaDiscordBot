@@ -5,7 +5,7 @@ FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /app
 
 # Copy the console app project file to the container and restore dependencies
-COPY DotaDiscordBot/DotaBot.csproj .
+COPY DotaBot.csproj .
 RUN dotnet restore
 
 # Copy the entire console app project to the container
