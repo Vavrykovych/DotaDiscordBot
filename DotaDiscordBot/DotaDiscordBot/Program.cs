@@ -35,9 +35,7 @@ class Program
                 .BuildServiceProvider();
 
             // BOT_TOKEN
-            Console.WriteLine("Read Bot Token");
             var token = Environment.GetEnvironmentVariable("BOT_TOKEN");
-            Console.WriteLine(token);
 
             _client.Log += Log;
             await RegisterCommandsAsync();
