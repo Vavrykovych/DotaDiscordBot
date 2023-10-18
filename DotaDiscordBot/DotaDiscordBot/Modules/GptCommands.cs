@@ -18,7 +18,7 @@ namespace DotaBot.Modules
         {
             _openAiService = new OpenAIService(new OpenAiOptions()
             {
-                ApiKey = "api-key",
+                ApiKey = "ApiKey",
             });
         }
         [Command("ai")]
@@ -41,7 +41,17 @@ namespace DotaBot.Modules
                 foreach (var choice in completionResult.Choices)
                 {
                     ChatHistory.ChatMessagesHistory.Add(ChatMessage.FromAssistant(choice.Message.Content));
-                    await ReplyAsync($"{Context.User.Mention} {choice.Message.Content}");
+                    if(choice.Message.Content.Length > 1000)
+                    {
+                        foreach(var m in SplitString(choice.Message.Content, 1000))
+                        {
+                            await ReplyAsync($"{Context.User.Mention} {m}");
+                        }
+                    }
+                    else
+                    {
+                        await ReplyAsync($"{Context.User.Mention} {choice.Message.Content}");
+                    }
                 }
             }
             else
@@ -63,5 +73,23 @@ namespace DotaBot.Modules
             ChatHistory.ChatMessagesHistory = new List<ChatMessage>();
             await ReplyAsync($"{Context.User.Mention} Історію розмови очищено");
         }
+
+
+
+
+        private static List<string> SplitString(string input, int chunkSize)
+        {
+            List<string> chunks = new List<string>();
+
+            for (int i = 0; i < input.Length; i += chunkSize)
+            {
+                int length = Math.Min(chunkSize, input.Length - i);
+                string chunk = input.Substring(i, length);
+                chunks.Add(chunk);
+            }
+
+            return chunks;
+        }
+
     }
 }
