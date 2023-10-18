@@ -33,9 +33,10 @@ class Program
                 .AddSingleton(_client)
                 .AddSingleton(_commands)
                 .BuildServiceProvider();
-
-            // BOT_TOKEN
+            
+            // TOKEN
             var token = Environment.GetEnvironmentVariable("BOT_TOKEN");
+
 
             _client.Log += Log;
             await RegisterCommandsAsync();
