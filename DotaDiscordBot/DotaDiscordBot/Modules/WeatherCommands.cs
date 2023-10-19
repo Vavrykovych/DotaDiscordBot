@@ -26,7 +26,7 @@ namespace DotaBot.Modules
                 {
                     var responseData = await response.Content.ReadAsStringAsync();
                     WeatherData weatherData = JsonConvert.DeserializeObject<WeatherData>(responseData);
-                    await ReplyAsync($"Weather in {loc}: {weatherData.Weather[0].Main} - {weatherData.Main.Temp}°C");
+                    await ReplyAsync($"Weather in {loc}: {weatherData.Weather[0].Main} : {weatherData.Main.Temp}°C");
                 }
                 else
                 {
