@@ -25,18 +25,10 @@ namespace DotaBot.Modules
                 dynamic data = Newtonsoft.Json.JsonConvert.DeserializeObject(content);
 
                 if (response.IsSuccessStatusCode && data.ContainsKey("profile"))
-                {
-                    int mmrEstimate = data.mmr_estimate.estimate;
-                    string personaname = data.profile.personaname;
-
-                    await ReplyAsync($"A user with the name {personaname} was found, his MMR = {mmrEstimate}");
-
-                }
+                    await ReplyAsync($"A user with the name {data.profile.personaname} " +
+                        $"was found, his MMR = {data.mmr_estimate.estimate}");
                 else
-                {
                     throw new HttpRequestException();
-                }
-
             }
             catch (HttpRequestException ex)
             {
