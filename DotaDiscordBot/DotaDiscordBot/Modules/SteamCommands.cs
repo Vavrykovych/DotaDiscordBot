@@ -11,36 +11,42 @@ namespace DotaBot.Modules
 {
     public class SteamCommands : ModuleBase<SocketCommandContext>
     {
-        [Command("get-mmr")]
+        [Command("get-info")]
 
         public async Task SteamViewer (string id)
         {
-            await ReplyAsync($"Search MMR user....");
+            await ReplyAsync($"Search user info....");
 
             try
             {
                 var httpClient = new HttpClient();
-                var response = await httpClient.GetAsync($"https://api.opendota.com/api/players/{id}");
+                var response = await httpClient.GetAsync($"https://api.opendota.com/api/players/{id}/wl");
                 var content = await response.Content.ReadAsStringAsync();
-                dynamic data = Newtonsoft.Json.JsonConvert.DeserializeObject(content);
+                dynamic WinLoseData = Newtonsoft.Json.JsonConvert.DeserializeObject(content);
 
-                if (response.IsSuccessStatusCode && data.ContainsKey("profile"))
+                if (response.IsSuccessStatusCode && (WinLoseData.win != 0 && WinLoseData.lose != 0))
                 {
-                    int mmrEstimate = data.mmr_estimate.estimate;
-                    string personaname = data.profile.personaname;
+                    response = await httpClient.GetAsync($"https://api.opendota.com/api/players/{id}");
+                    content = await response.Content.ReadAsStringAsync();
+                    dynamic PlayerData = Newtonsoft.Json.JsonConvert.DeserializeObject(content);
 
-                    await ReplyAsync($"A user with the name {personaname} was found, his MMR = {mmrEstimate}");
+                    double WinRate = Math.Round
+                        (
+                        ((double)WinLoseData.win / ((double)WinLoseData.win + (double)WinLoseData.lose)) * 100.0, 2
+                        );
 
+                    await ReplyAsync($"A user with name {PlayerData.profile.personaname}" +
+                        $" was found:\nHis MMR = {PlayerData.mmr_estimate.estimate}" +
+                        $"\nWin: {WinLoseData.win}\nlose: {WinLoseData.lose}\nWinRate = {WinRate}%");
                 }
                 else
                 {
-                    throw new HttpRequestException();
+                    throw new Exception();
                 }
-
             }
-            catch (HttpRequestException ex)
+            catch (Exception ex)
             {
-                await ReplyAsync($"User with id: {id} not found, or you entered an invalid id");
+                await ReplyAsync($"User with id: {id} not found, or you entered an invalid id, or no games have been played on the account");
             }
         }
     }
